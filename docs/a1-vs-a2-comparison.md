@@ -55,6 +55,49 @@ spec §7「ECC Tools が judge する」path、ECC Tools 公式 doc を 100% 読
 
 今後: ECC Tools 系 / 新ツール導入時は **公式 doc + 実 trigger 動作を verify** してから spec 起稿する。
 
+## 採用後の追加 fix (= 実 session 動作 verify 後)
+
+a-1 を本体 `~/.claude/CLAUDE.md` 反映 + e2e test (= katsu の新 session で「タスク管理 CLI design して」) 実施後に発見した問題と対策:
+
+### 動作 verify 結果
+
+| step | a-1 v1 期待 | 実動作 | 結果 |
+|------|-----------|--------|------|
+| 1 brainstorming | ✓ Skill tool invoke | **OK** |
+| 2 ECC planner dispatch | Agent tool 0 回 | **FAIL** |
+| 3+ | (未到達) | - |
+
+### 根本原因
+
+`superpowers:brainstorming` SKILL.md が「terminal state = writing-plans only、ONLY skill to invoke after」と HARD-GATE 明記、a-1 v1 step 2「planner 強制」と衝突 → くろみが superpowers 後段指示に従って planner skip。
+
+### a-1 revise (= v2 確定)
+
+- **大原則明示**: 「superpowers (= 手順書) + ECC (= 工具) 併用」、二者択一じゃない
+- **planner を必須から optional に降格** (= writing-plans 並列 or 大型 architecture 判断時のみ)
+- **必須は実装完了後の `code-reviewer` + `security-reviewer` 並列 dispatch** のみ
+- **既知衝突明示**: superpowers HARD-GATE 違反しないよう wording 整合
+
+### 追加 fix (= 本 session で実施)
+
+1. CLAUDE.md L297 typo 修正 (`設定書` → `設計書`)
+2. settings.json deny list 4 → 26 entries (dd / mkfs / shred / docker prune / docker-compose down -v / git clean -fdx / npm publish 等)
+3. VPS hostname / IP 平文除去 + `~/.claude/secrets/ebi.env` (0600 perm) 分離
+4. (E) 新規 `block-destructive-bash.js` hook = regex deny で `bash -c 'rm -rf'` / `eval` / pipe-to-shell 等 shell trick 経由も block
+5. (F) SessionStart handoff inject に owner check + perm <=644 check + SAFETY warning prefix (= prompt injection 緩和)
+
+### 残 MEDIUM backlog (= 別 task)
+
+- mcp-health-check.js dormant injection (= `ECC_MCP_RECONNECT_<SERVERNAME>` env 未設定で dormant、設定時は要 serverName sanitize)
+- config-protection.js extend (= tsconfig.json / .husky / .pre-commit-config.yaml 等追加保護)
+- additionalDirectories 整理 (= sub-path redundancy、Claude Code permission 挙動 verify 後)
+- MEMORY.md 178KB 肥大整理 (= index 圧縮)
+- 1-2 ヶ月後 Pro tier 価値判定 → keep / cancel
+
+## archive 宣言
+
+本 repo `kk-ben/kuromi-config-ecc-poc` は **a-1 採用判定 + e2e verify + revise の経緯 archive**。本体 SSoT は `~/.claude/CLAUDE.md` (= 311→324 行 a-1 revised)。**本 repo は read-only reference**、追加変更予定なし。
+
 ---
 
 ## 関連 file
