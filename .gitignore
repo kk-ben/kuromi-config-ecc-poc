@@ -1,0 +1,25 @@
+# Sensitive
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+secrets/
+auth-profiles.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Local cache
+node_modules/
+*.log
+
+# Backups
+*.bak
+*.bak-*
+*.backup_*
