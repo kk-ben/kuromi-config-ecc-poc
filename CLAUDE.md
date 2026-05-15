@@ -86,3 +86,33 @@
   "CLAUDE_CODE_NO_FLICKER": "1"
 }
 ```
+
+## superpowers × ECC 連携 (a-2: hook-based 物理強制)
+
+`hooks-snippets/superpowers-ecc-bridge.js` で物理強制:
+
+- **PostToolUse on Skill**: superpowers:brainstorming 完了検出 → flag 立てる (`~/.claude/state/ecc-bridge.flag`)
+- **UserPromptSubmit**: flag check → 「ECC planner dispatch 必須」を `additionalContext` で injection、flag 消費
+
+settings.json への hook 登録例:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {"matcher": "Skill", "hooks": [{
+        "type": "command",
+        "command": "node /path/to/hooks-snippets/superpowers-ecc-bridge.js"
+      }]}
+    ],
+    "UserPromptSubmit": [
+      {"matcher": "", "hooks": [{
+        "type": "command",
+        "command": "node /path/to/hooks-snippets/superpowers-ecc-bridge.js"
+      }]}
+    ]
+  }
+}
+```
+
+例外なし、物理強制 100%。bypass = hook script を無効化する必要。
