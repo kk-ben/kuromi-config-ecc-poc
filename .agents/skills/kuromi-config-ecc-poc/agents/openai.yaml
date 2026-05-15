@@ -1,0 +1,6 @@
+interface:
+  display_name: "Kuromi Config Ecc Poc"
+  short_description: "Repo-specific patterns and workflows for kuromi-config-ecc-poc"
+  default_prompt: "Use the kuromi-config-ecc-poc repo skill to follow existing architecture, testing, and workflow conventions."
+policy:
+  allow_implicit_invocation: true
