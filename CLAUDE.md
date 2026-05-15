@@ -86,3 +86,19 @@
   "CLAUDE_CODE_NO_FLICKER": "1"
 }
 ```
+
+## superpowers × ECC 連携ルール (a-1: CLAUDE.md rule-based)
+
+新機能追加 / 大型改修 / 実装 prompt を katsu から受けた場合、以下 sequence 厳守:
+
+1. **superpowers:brainstorming** で要件探索
+2. brainstorming 完了 (= design doc commit) 後、**必ず Agent tool で ECC `planner` agent dispatch**
+3. planner 出力 (= phase 別 implementation plan) を **superpowers:writing-plans** に渡す
+4. writing-plans 完了後、**ECC `tdd-guide` agent を Agent tool で dispatch** して TDD loop
+5. 実装完了後、**ECC `code-reviewer` + `security-reviewer` agent を並列 dispatch**
+6. **superpowers:verification-before-completion** で最終確認
+
+例外 (rule skip 可):
+- 単純な typo / 1 行修正 / 既知 file の rename
+- katsu が明示的に「planner 不要」「skip ECC」と指示
+- bug fix で root cause が明確かつ局所的な case
